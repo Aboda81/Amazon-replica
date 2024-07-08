@@ -1,8 +1,6 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { use } = require('../app');
-
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -80,6 +78,7 @@ const getUserProfile = async (req, res) => {
     try {
         console.log(req.user)
         const user = await User.findByPk(req.user.id, { attributes: { exclude: ['password'] } });
+        
         res.json(user);
     } catch (err) {
         console.error(err.message);
