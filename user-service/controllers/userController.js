@@ -1,6 +1,8 @@
 const User = require('../models/userModel');
+const Address = require('../models/addressModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Snowflake = require('./snowflake'); 
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -9,21 +11,22 @@ const registerUser = async (req, res) => {
         if (user) {
             return res.status(400).json({ msg: 'User already exists' });
         }
-
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-
+        const snowflake = new Snowflake();
+        const id = snowflake.generate();
         user = await User.create({
+            id,
             name,
             email,
             password: hashedPassword,
         });
 
         const payload = {
-            user: {
+            
                 id: user.id,
-            },
-        };
+            }
+    
 
         jwt.sign(
             payload,
@@ -35,7 +38,7 @@ const registerUser = async (req, res) => {
             }
         );
     } catch (err) {
-        console.error(err.message);
+        console.error(err.message,);
         res.status(500).send('Server error');
     }
 };
@@ -76,10 +79,9 @@ const loginUser = async (req, res) => {
 
 const getUserProfile = async (req, res) => {
     try {
-        console.log(req.user)
         const user = await User.findByPk(req.user.id, { attributes: { exclude: ['password'] } });
-        
-        res.json(user);
+        const addresses = await Address.findAll({where:{userid:user.id}})
+        res.json({user,addresses});
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error');
