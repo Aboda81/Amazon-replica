@@ -30,7 +30,7 @@ res.json(address);
 }
 const deleteAddress = async (req,res) =>{
     try{
-        const {id} = req.body;
+        const id = req.params.id;
         const address = Address.destroy({where:{id,userid:req.user.id}})
         res.status(200).json(address);
     }
@@ -41,8 +41,9 @@ const deleteAddress = async (req,res) =>{
 }
 const updateAddress = async (req,res) =>{
     try{
-        const {id,country, fullname,phonenumber,street,buildingno,postalcode,city,district,governorate,landmark} = req.body;
-        const newAddress = Address.update({country, fullname,phonenumber,street,buildingno,postalcode,city,district,governorate,landmark},{where:{id:req.user.id,id}})
+        const {country, fullname,phonenumber,street,buildingno,postalcode,city,district,governorate,landmark} = req.body;
+        const id = req.params.id;
+        const newAddress = Address.update({country, fullname,phonenumber,street,buildingno,postalcode,city,district,governorate,landmark},{where:{id,userid:req.user.id}})
         res.status(200).json(newAddress);
     } catch(err){
         console.error.log(err.message);

@@ -5,6 +5,9 @@ const jwt = require('jsonwebtoken');
 const Snowflake = require('./snowflake'); 
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
+ 
+
+//   res.status(200).json({ message: 'Password reset email sent' });
 
     try {
         let user = await User.findOne({ where: { email } });
@@ -32,9 +35,10 @@ const registerUser = async (req, res) => {
             payload,
             process.env.JWT_SECRET,
             { expiresIn: '1h' },
-            (err, token) => {
+             (err, token) => {
                 if (err) throw err;
                 res.json({ token });
+
             }
         );
     } catch (err) {
@@ -86,10 +90,37 @@ const getUserProfile = async (req, res) => {
         console.error(err.message);
         res.status(500).send('Server error');
     }
-};
+}
+const changePassowrd = async (req,res) => {
+    try{
+        
+        const user = await User.findByPk(req.user.id);
+        console.log(user);
+        const {oldPassword, newPassword} = req.body;
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ msg: 'Wrong password' });
+        }
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        await User.update(
+            { password: hashedPassword },
+            {
+              where: {
+                id: req.user.id,
+              },
+            },
+          )
+          .then(()=>{res.status(200).json({msg:"password updated successfully"})})
+    }catch(err){
+        console.log(err.message);
+        res.status(500).send("Server error");
+    }
+}
 
 module.exports = {
     registerUser,
     loginUser,
     getUserProfile,
+    changePassowrd,
 };
