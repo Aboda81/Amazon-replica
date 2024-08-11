@@ -4,11 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Snowflake = require('./snowflake'); 
 const registerUser = async (req, res) => {
-    const { name, email, password } = req.body;
- 
-
-//   res.status(200).json({ message: 'Password reset email sent' });
-
+    const { name, email, password } = req.body; 
     try {
         let user = await User.findOne({ where: { email } });
         if (user) {
@@ -25,19 +21,17 @@ const registerUser = async (req, res) => {
             password: hashedPassword,
         });
 
-        const payload = {
-            
-                id: user.id,
-            }
+        const payload = {id}
     
 
         jwt.sign(
             payload,
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET, 
             { expiresIn: '1h' },
              (err, token) => {
                 if (err) throw err;
-                res.json({ token });
+                res.cookie('jwt',token)
+                res.json({user: user.id});
 
             }
         );
@@ -72,7 +66,8 @@ const loginUser = async (req, res) => {
             { expiresIn: '1h' },
             (err, token) => {
                 if (err) throw err;
-                res.json({ token });
+                 res.cookie('jwt',token)
+                res.json({user: user.id, role:user.role});
             }
         );
     } catch (err) {

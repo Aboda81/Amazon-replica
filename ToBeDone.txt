@@ -1,5 +1,14 @@
+
+USER SERVICE
 change password.
 Forget and reset password 
 Update Address
 --Set Default Address
 List All Addresses (seperate from get profile) -- maybe!
+
+-------------------------------------------------------------------------------------
+PRODUCT SERVICE
+AddProduct {Done}
+editProduct
+deleteProduct
+getProduct 
