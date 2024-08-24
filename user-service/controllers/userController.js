@@ -21,7 +21,7 @@ const registerUser = async (req, res) => {
             password: hashedPassword,
         });
 
-        const payload = {id}
+        const payload = {id,role:user.role}
     
 
         jwt.sign(
@@ -57,7 +57,7 @@ const loginUser = async (req, res) => {
 
         const payload = {
             
-                id: user.id,
+                id: user.id,role:user.role
         };
 
         jwt.sign(

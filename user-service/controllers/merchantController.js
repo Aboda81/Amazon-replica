@@ -44,7 +44,7 @@ const registerMerchant = async (req,res)=>{
             landmark,
     })
     jwt.sign(
-        {id:merchantID},
+        {id:merchantID,role:user.role},
         process.env.JWT_SECRET, 
         { expiresIn: '1h' },
          (err, token) => {
