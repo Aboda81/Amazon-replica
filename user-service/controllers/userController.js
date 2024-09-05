@@ -113,9 +113,27 @@ const changePassowrd = async (req,res) => {
     }
 }
 
+const validateToken = async (req, res) => {
+    try {
+      const token = req.header('Authorization').replace('Bearer ', '');
+      
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findByPk(decoded.id,{attributes:{exclude:['password']}})
+  
+      if (!user) {
+        return res.status(401).json({ message: 'User not found' });
+      }
+  
+      res.json({ user });
+    } catch (error) {
+      res.status(401).json({ message: 'Not authorized, token failed' });
+    }
+  };
+
 module.exports = {
     registerUser,
     loginUser,
     getUserProfile,
     changePassowrd,
+    validateToken,
 };

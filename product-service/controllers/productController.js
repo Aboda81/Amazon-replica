@@ -14,7 +14,7 @@ const addProduct = async (req, res) => {
       CloudImages.push({url:result.secure_url,publicId:result.public_id});
     })
     const newProduct = new Product({
-      merchantId: req.merchant.id,
+      merchantId: req.user.id,
       name,
       description,
       price,
@@ -43,7 +43,7 @@ const getProductbyId = async(req,res)=>{
 const updateProduct = async(req,res)=>{
   
   const productId = req.params.id;
-  const merchantId = req.merchant.id;
+  const merchantId = req.user.id;
   try{
     console.log(req.body);
 
@@ -56,7 +56,7 @@ const updateProduct = async(req,res)=>{
 // Delete Product -- test Done
 const deleteProduct = async(req,res)=>{
   const productId = req.params.id;
-  const merchantId = req.merchant.id;
+  const merchantId = req.user.id;
   try{
     const product = await Product.findOne({_id:productId,merchantId})
     if(!product){
@@ -84,13 +84,30 @@ const deleteProduct = async(req,res)=>{
 }
 // get all Merchant Products -- Done 
 const getMerchantProducts = async (req,res) =>{
-  const merchantId = req.merchant.id;
+  const merchantId = req.user.id;
+  console.log(merchantId);
+  
   try{
     const products = await Product.find({merchantId})
     res.status(200).json(products)
   }
   catch(error){
     res.status(500).json({message:error.message});
+  }
+}
+const getStock = async (req,res) =>{
+  const {productId} = req.params
+  try{
+    product = await Product.findById(productId).select("stock")
+    if(!product){
+      res.status(500).json({message:"Product not found"})
+    }
+    res.status(200).json(product.stock)
+  }
+  catch(error){
+    console.log(error.message);
+    res.status(500).json({message:"server error"})
+    
   }
 }
 
@@ -101,4 +118,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getMerchantProducts,
+  getStock,
 };
