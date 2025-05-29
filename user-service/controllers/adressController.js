@@ -31,8 +31,14 @@ res.json(address);
 const deleteAddress = async (req,res) =>{
     try{
         const id = req.params.id;
-        const address = Address.destroy({where:{id,userid:req.user.id}})
-        res.status(200).json(address);
+        const address = await Address.destroy({where:{id,userid:req.user.id}})
+        if(address === 0){
+            return res.status(404).json({msg:'Address not found'})
+        }
+        else{
+            return res.status(200).json({msg:'Address deleted successfully'})
+        }
+        
     }
     catch (err) {
         console.error(err.message);
